@@ -13,7 +13,10 @@ app.post('/api/analyze', async (req, res) => {
   console.log('Analyzing:', url);
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({
+  headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
+});
   const context = await browser.newContext();
   const page = await context.newPage();
   const resources = [];
