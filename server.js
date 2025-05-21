@@ -3,7 +3,9 @@ const cors = require('cors');
 const { chromium } = require('playwright');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://wp-diagnostic-frontend.vercel.app"
+}));
 app.use(express.json());
 
 app.post('/api/analyze', async (req, res) => {
@@ -65,11 +67,14 @@ app.post('/api/analyze', async (req, res) => {
       resources: perfData.resourceEntries
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to analyze the site', details: error.message });
-  } finally {
-    await browser.close();
-  }
-});
+  console.error("Analysis failed:", error);
+  res.status(500).json({
+    error: 'Failed to analyze the site',
+    details: error.message,
+    stack: error.stack
+  });
+}
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
